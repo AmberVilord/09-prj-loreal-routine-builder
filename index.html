@@ -27,7 +27,7 @@
         >
           Right to Left Languages
         </button>
-        <label for="rtlLanguageSelect" class="visually-hidden"
+        <label id="rtlLanguageLabel" for="rtlLanguageSelect" class="visually-hidden"
           >Choose language</label
         >
         <select
@@ -35,11 +35,21 @@
           class="rtl-language-select hidden"
           aria-label="Choose a right to left language"
         >
-          <option value="" selected disabled>Select an RTL language</option>
-          <option id="rtlOptionArabic" value="ar">Arabic</option>
-          <option id="rtlOptionHebrew" value="he">Hebrew</option>
-          <option id="rtlOptionPersian" value="fa">Persian (Farsi)</option>
-          <option id="rtlOptionUrdu" value="ur">Urdu</option>
+          <option id="rtlOptionDefault" value="" selected disabled>
+            Select an RTL language
+          </option>
+          <option id="rtlOptionArabic" value="ar">العربية</option>
+          <option id="rtlOptionHebrew" value="he">עברית</option>
+          <option id="rtlOptionPersian" value="fa">فارسی</option>
+          <option id="rtlOptionUrdu" value="ur">اردو</option>
+          <option id="rtlOptionPashto" value="ps">پښتو</option>
+          <option id="rtlOptionSindhi" value="sd">سنڌي</option>
+          <option id="rtlOptionUyghur" value="ug">ئۇيغۇرچە</option>
+          <option id="rtlOptionYiddish" value="yi">ייִדיש</option>
+          <option id="rtlOptionDivehi" value="dv">ދިވެހި</option>
+          <option id="rtlOptionKurdishSorani" value="ckb">
+            کوردی (سۆرانی)
+          </option>
           <option id="rtlOptionEnglish" value="en">
             Back to English (LTR)
           </option>
@@ -53,10 +63,48 @@
         <h1 id="siteTitle" class="site-title">
           Smart Routine &amp; Product Advisor
         </h1>
-        <p class="site-subtitle" aria-hidden="true">
+        <p id="siteSubtitle" class="site-subtitle" aria-hidden="true">
           ~ your personal beauty ritual ~
         </p>
         <div class="header-divider" aria-hidden="true"><span>✦</span></div>
+
+        <nav class="header-quick-links" aria-label="L'Oreal quick links">
+          <a
+            id="quickLinkBeautyMagazine"
+            href="https://www.lorealparisusa.com/beauty-magazine"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Beauty Magazine</a
+          >
+          <a
+            id="quickLinkMakeup"
+            href="https://www.lorealparisusa.com/makeup"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Makeup</a
+          >
+          <a
+            id="quickLinkSkinCare"
+            href="https://www.lorealparisusa.com/skin-care"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Skin Care</a
+          >
+          <a
+            id="quickLinkHairColor"
+            href="https://www.lorealparisusa.com/hair-color"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Hair Color</a
+          >
+          <a
+            id="quickLinkCommitments"
+            href="https://www.lorealparisusa.com/our-company/our-commitments"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Our Commitments</a
+          >
+        </nav>
       </header>
 
       <!-- Category Filter -->
@@ -110,7 +158,9 @@
         <div id="chatWindow" class="chat-window"></div>
 
         <form id="chatForm" class="chat-form">
-          <label for="userInput" class="visually-hidden">Message</label>
+          <label id="userInputLabel" for="userInput" class="visually-hidden"
+            >Message</label
+          >
           <input
             id="userInput"
             name="userInput"
@@ -121,7 +171,7 @@
           />
           <button type="submit" id="sendBtn">
             <i class="fa-solid fa-paper-plane"></i>
-            <span class="visually-hidden">Send</span>
+            <span id="sendLabel" class="visually-hidden">Send</span>
           </button>
         </form>
       </section>
