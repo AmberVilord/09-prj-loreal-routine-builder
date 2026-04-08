@@ -28,7 +28,7 @@ const RTL_LANGUAGES = new Set([
   "ug",
   "yi",
   "dv",
-  "ckb"
+  "ckb",
 ]);
 
 /* Basic UI translations for supported languages */
@@ -82,7 +82,7 @@ const translations = {
     chatPlaceholder:
       "Chat placeholder: connect this form to your conversation logic so the assistant can continue the routine discussion.",
     starterMessage:
-      "Choose a category, select products, and use the placeholders to keep building this project."
+      "Choose a category, select products, and use the placeholders to keep building this project.",
   },
   ar: {
     documentTitle: "لوريال | مستشار الروتين والمنتجات الذكي",
@@ -127,9 +127,10 @@ const translations = {
     removeProductAria: "إزالة {name}",
     selectAtLeastOne: "اختر منتجاً واحداً على الأقل أولاً.",
     generateRoutineFor: "أنشئ روتيناً لـ: {products}",
-    routinePlaceholder: "نص تجريبي: اربط هذا الزر بمنشئ الروتين بالذكاء الاصطناعي.",
+    routinePlaceholder:
+      "نص تجريبي: اربط هذا الزر بمنشئ الروتين بالذكاء الاصطناعي.",
     chatPlaceholder: "نص تجريبي: اربط هذا النموذج بمنطق المحادثة لديك.",
-    starterMessage: "اختر فئة وحدد المنتجات ثم واصل بناء هذا المشروع."
+    starterMessage: "اختر فئة وحدد المنتجات ثم واصل بناء هذا المشروع.",
   },
   he: {
     documentTitle: "לוריאל | יועץ חכם לשגרה ומוצרים",
@@ -176,7 +177,7 @@ const translations = {
     generateRoutineFor: "צור שגרה עבור: {products}",
     routinePlaceholder: "טקסט זמני: חבר את הכפתור למחולל שגרה מבוסס AI.",
     chatPlaceholder: "טקסט זמני: חבר את הטופס ללוגיקת השיחה שלך.",
-    starterMessage: "בחר קטגוריה, בחר מוצרים והמשך לבנות את הפרויקט."
+    starterMessage: "בחר קטגוריה, בחר מוצרים והמשך לבנות את הפרויקט.",
   },
   fa: {
     documentTitle: "لورآل | مشاور هوشمند روتین و محصول",
@@ -221,9 +222,11 @@ const translations = {
     removeProductAria: "حذف {name}",
     selectAtLeastOne: "ابتدا حداقل یک محصول انتخاب کنید.",
     generateRoutineFor: "یک روتین برای این موارد بساز: {products}",
-    routinePlaceholder: "متن نمونه: این دکمه را به سازنده روتین هوش مصنوعی وصل کنید.",
+    routinePlaceholder:
+      "متن نمونه: این دکمه را به سازنده روتین هوش مصنوعی وصل کنید.",
     chatPlaceholder: "متن نمونه: این فرم را به منطق گفتگوی خود وصل کنید.",
-    starterMessage: "یک دسته انتخاب کنید، محصولات را انتخاب کنید و پروژه را ادامه دهید."
+    starterMessage:
+      "یک دسته انتخاب کنید، محصولات را انتخاب کنید و پروژه را ادامه دهید.",
   },
   ur: {
     documentTitle: "لورئیل | اسمارٹ روٹین اور پروڈکٹ ایڈوائزر",
@@ -270,7 +273,8 @@ const translations = {
     generateRoutineFor: "اس کے لئے روٹین بنائیں: {products}",
     routinePlaceholder: "عارضی متن: اس بٹن کو AI روٹین بلڈر سے جوڑیں۔",
     chatPlaceholder: "عارضی متن: اس فارم کو اپنی گفتگو کی منطق سے جوڑیں۔",
-    starterMessage: "ایک زمرہ منتخب کریں، مصنوعات منتخب کریں، اور منصوبہ جاری رکھیں۔"
+    starterMessage:
+      "ایک زمرہ منتخب کریں، مصنوعات منتخب کریں، اور منصوبہ جاری رکھیں۔",
   },
   ps: {
     languageToggle: "له ښي نه کيڼو ژبې",
@@ -303,7 +307,8 @@ const translations = {
     generateRoutineFor: "د دې لپاره روټین جوړ کړئ: {products}",
     routinePlaceholder: "لنډمهاله متن: دا تڼۍ خپل AI روټین جوړونکي سره ونښلوئ.",
     chatPlaceholder: "لنډمهاله متن: دا فورم د خپل چټ منطق سره ونښلوئ.",
-    starterMessage: "یو کټګوري وټاکئ، محصولات وټاکئ، او پروژه نوره هم پرمخ یوسئ."
+    starterMessage:
+      "یو کټګوري وټاکئ، محصولات وټاکئ، او پروژه نوره هم پرمخ یوسئ.",
   },
   sd: {
     languageToggle: "ساڄي کان کاٻي ٻوليون",
@@ -336,7 +341,7 @@ const translations = {
     generateRoutineFor: "هن لاءِ روٽين ٺاهيو: {products}",
     routinePlaceholder: "عارضي متن: هن بٽڻ کي پنهنجي AI روٽين بلڊر سان ڳنڍيو.",
     chatPlaceholder: "عارضي متن: هن فارم کي پنهنجي چيٽ لاجڪ سان ڳنڍيو.",
-    starterMessage: "هڪ زمرو چونڊيو، پراڊڪٽس چونڊيو، ۽ منصوبي کي جاري رکو."
+    starterMessage: "هڪ زمرو چونڊيو، پراڊڪٽس چونڊيو، ۽ منصوبي کي جاري رکو.",
   },
   ug: {
     languageToggle: "ئوڭدىن سولغا تىللار",
@@ -367,9 +372,10 @@ const translations = {
     removeProductAria: "{name} نى ئۆچۈر",
     selectAtLeastOne: "ئالدى بىلەن كەم دېگەندە بىر مەھسۇلات تاللاڭ.",
     generateRoutineFor: "بۇلار ئۈچۈن كۈندىلىك ياساڭ: {products}",
-    routinePlaceholder: "ۋاقىتلىق تېكىست: بۇ كۇنۇپكىنى AI كۈندىلىك ياسىغۇچقا ئۇلاڭ.",
+    routinePlaceholder:
+      "ۋاقىتلىق تېكىست: بۇ كۇنۇپكىنى AI كۈندىلىك ياسىغۇچقا ئۇلاڭ.",
     chatPlaceholder: "ۋاقىتلىق تېكىست: بۇ جەدۋەلنى سۆھبەت لوگىكىڭىزغا ئۇلاڭ.",
-    starterMessage: "بىر تۈر تاللاڭ، مەھسۇلات تاللاڭ، ۋە تۈرنى داۋاملاشتۇرۇڭ."
+    starterMessage: "بىر تۈر تاللاڭ، مەھسۇلات تاللاڭ، ۋە تۈرنى داۋاملاشتۇرۇڭ.",
   },
   yi: {
     languageToggle: "שפראכן פון רעכט צו לינקס",
@@ -400,9 +406,11 @@ const translations = {
     removeProductAria: "נעם אוועק {name}",
     selectAtLeastOne: "קלייבט קודם כאטש איין פראדוקט.",
     generateRoutineFor: "בוי א רוטין פאר: {products}",
-    routinePlaceholder: "פלאצהאלטער: פארבינדט דעם קנעפל צו אייער AI רוטין בילדער.",
+    routinePlaceholder:
+      "פלאצהאלטער: פארבינדט דעם קנעפל צו אייער AI רוטין בילדער.",
     chatPlaceholder: "פלאצהאלטער: פארבינדט דעם פארם צו אייער שמועס-לאגיק.",
-    starterMessage: "קלייבט א קאטעגאריע, קלייבט פראדוקטן, און בויט ווייטער דעם פראיעקט."
+    starterMessage:
+      "קלייבט א קאטעגאריע, קלייבט פראדוקטן, און בויט ווייטער דעם פראיעקט.",
   },
   dv: {
     languageToggle: "ކަނާތުން ވާ ބަސްތައް",
@@ -435,7 +443,8 @@ const translations = {
     generateRoutineFor: "މިއަށް ރޫޓީން ހެދޭ: {products}",
     routinePlaceholder: "ވަގުތީ ލިޔުމެއް: މި ބަޓަން AI ރޫޓީން ބިލްޑަރާ ގުޅާ.",
     chatPlaceholder: "ވަގުތީ ލިޔުމެއް: މި ފޯމް ޗެޓް ލޮޖިކާ ގުޅާ.",
-    starterMessage: "ކެޓަގަރީ ހޮވާ، ޕްރޮޑަކްޓް ހޮވާ، އަދި ޕްރޮޖެކްޓް ދެމިހުރިހާ."
+    starterMessage:
+      "ކެޓަގަރީ ހޮވާ، ޕްރޮޑަކްޓް ހޮވާ، އަދި ޕްރޮޖެކްޓް ދެމިހުރިހާ.",
   },
   ckb: {
     languageToggle: "زمانەکانی ڕاست بۆ چەپ",
@@ -468,11 +477,10 @@ const translations = {
     generateRoutineFor: "ڕوتین دروست بکە بۆ: {products}",
     routinePlaceholder:
       "دەقی نموونەیی: ئەم دوگمەیە بە دروستکەری AIی ڕوتینەکەتەوە ببەستە.",
-    chatPlaceholder:
-      "دەقی نموونەیی: ئەم فۆرمە بە لۆژیکی گفتوگۆکەتەوە ببەستە.",
+    chatPlaceholder: "دەقی نموونەیی: ئەم فۆرمە بە لۆژیکی گفتوگۆکەتەوە ببەستە.",
     starterMessage:
-      "پۆلێک هەڵبژێرە، بەرهەمەکان هەڵبژێرە، و پڕۆژەکە بەردەوام بکە."
-  }
+      "پۆلێک هەڵبژێرە، بەرهەمەکان هەڵبژێرە، و پڕۆژەکە بەردەوام بکە.",
+  },
 };
 
 /* Get translated text with English fallback */
@@ -517,7 +525,7 @@ function appendMessage(role, text) {
 /* Keep the starter guidance message translated after language changes */
 function renderOrUpdateStarterMessage() {
   const existingStarterMessage = chatWindow.querySelector(
-    '.chat-message.assistant[data-message-type="starter"]'
+    '.chat-message.assistant[data-message-type="starter"]',
   );
 
   if (existingStarterMessage) {
@@ -611,7 +619,7 @@ function renderSelectedProducts() {
             ×
           </button>
         </div>
-      `
+      `,
     )
     .join("");
 }
@@ -652,7 +660,7 @@ function displayProducts(products) {
             </p>
           </div>
         </article>
-      `
+      `,
     )
     .join("");
 
@@ -686,7 +694,7 @@ categoryFilter.addEventListener("change", async (event) => {
   const selectedCategory = event.target.value;
 
   const filteredProducts = products.filter(
-    (product) => product.category === selectedCategory
+    (product) => product.category === selectedCategory,
   );
 
   displayProducts(filteredProducts);
@@ -752,9 +760,14 @@ generateRoutineBtn.addEventListener("click", () => {
     return;
   }
 
-  const productNames = selectedProducts.map((product) => product.name).join(", ");
+  const productNames = selectedProducts
+    .map((product) => product.name)
+    .join(", ");
 
-  appendMessage("user", tFormat("generateRoutineFor", { products: productNames }));
+  appendMessage(
+    "user",
+    tFormat("generateRoutineFor", { products: productNames }),
+  );
   appendMessage("assistant", t("routinePlaceholder"));
 });
 
@@ -779,7 +792,7 @@ function updateStaticText() {
   const siteTitle = document.getElementById("siteTitle");
   const siteSubtitle = document.getElementById("siteSubtitle");
   const selectedProductsHeading = document.getElementById(
-    "selectedProductsHeading"
+    "selectedProductsHeading",
   );
   const chatHeading = document.getElementById("chatHeading");
   const userInputLabel = document.getElementById("userInputLabel");
@@ -789,7 +802,7 @@ function updateStaticText() {
   const footerTerms = document.getElementById("footerTerms");
   const footerContact = document.getElementById("footerContact");
   const quickLinkBeautyMagazine = document.getElementById(
-    "quickLinkBeautyMagazine"
+    "quickLinkBeautyMagazine",
   );
   const quickLinkMakeup = document.getElementById("quickLinkMakeup");
   const quickLinkSkinCare = document.getElementById("quickLinkSkinCare");
@@ -798,22 +811,34 @@ function updateStaticText() {
   const rtlOptionDefault = document.getElementById("rtlOptionDefault");
   const rtlOptionEnglish = document.getElementById("rtlOptionEnglish");
 
-  const categoryOptionDefault = document.getElementById("categoryOptionDefault");
-  const categoryOptionCleanser = document.getElementById("categoryOptionCleanser");
-  const categoryOptionMoisturizer = document.getElementById(
-    "categoryOptionMoisturizer"
+  const categoryOptionDefault = document.getElementById(
+    "categoryOptionDefault",
   );
-  const categoryOptionHaircare = document.getElementById("categoryOptionHaircare");
+  const categoryOptionCleanser = document.getElementById(
+    "categoryOptionCleanser",
+  );
+  const categoryOptionMoisturizer = document.getElementById(
+    "categoryOptionMoisturizer",
+  );
+  const categoryOptionHaircare = document.getElementById(
+    "categoryOptionHaircare",
+  );
   const categoryOptionMakeup = document.getElementById("categoryOptionMakeup");
-  const categoryOptionHairColor = document.getElementById("categoryOptionHairColor");
+  const categoryOptionHairColor = document.getElementById(
+    "categoryOptionHairColor",
+  );
   const categoryOptionHairStyling = document.getElementById(
-    "categoryOptionHairStyling"
+    "categoryOptionHairStyling",
   );
   const categoryOptionMensGrooming = document.getElementById(
-    "categoryOptionMensGrooming"
+    "categoryOptionMensGrooming",
   );
-  const categoryOptionSuncare = document.getElementById("categoryOptionSuncare");
-  const categoryOptionFragrance = document.getElementById("categoryOptionFragrance");
+  const categoryOptionSuncare = document.getElementById(
+    "categoryOptionSuncare",
+  );
+  const categoryOptionFragrance = document.getElementById(
+    "categoryOptionFragrance",
+  );
 
   document.title = t("documentTitle");
   siteTitle.textContent = t("siteTitle");
@@ -859,7 +884,9 @@ function updateProductUiText() {
 
   detailButtons.forEach((button) => {
     const isExpanded = button.getAttribute("aria-expanded") === "true";
-    button.textContent = isExpanded ? t("hideDescription") : t("showDescription");
+    button.textContent = isExpanded
+      ? t("hideDescription")
+      : t("showDescription");
   });
 }
 
@@ -869,7 +896,9 @@ function applyLanguage(languageCode) {
     .toLowerCase()
     .split("-")[0];
 
-  currentLanguage = translations[normalizedLanguage] ? normalizedLanguage : "en";
+  currentLanguage = translations[normalizedLanguage]
+    ? normalizedLanguage
+    : "en";
 
   const isRtl = RTL_LANGUAGES.has(currentLanguage);
   document.documentElement.lang = currentLanguage;
@@ -886,7 +915,7 @@ function applyLanguage(languageCode) {
 
   if (categoryFilter.value) {
     const filteredProducts = allProducts.filter(
-      (product) => product.category === categoryFilter.value
+      (product) => product.category === categoryFilter.value,
     );
     displayProducts(filteredProducts);
   } else {
@@ -896,7 +925,9 @@ function applyLanguage(languageCode) {
 
 /* Automatically switch to RTL + translation when browser language is RTL */
 function detectAndApplyLanguage() {
-  const browserLanguage = (navigator.language || "en").toLowerCase().split("-")[0];
+  const browserLanguage = (navigator.language || "en")
+    .toLowerCase()
+    .split("-")[0];
 
   if (RTL_LANGUAGES.has(browserLanguage)) {
     applyLanguage(browserLanguage);

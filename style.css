@@ -741,11 +741,7 @@ body::before {
 
 .generate-btn,
 #sendBtn {
-  background: linear-gradient(
-    135deg,
-    var(--gold-400) 0%,
-    var(--gold-500) 100%
-  );
+  background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 100%);
   color: var(--ink-900);
   box-shadow: 0 4px 16px rgba(201, 162, 39, 0.28);
 }
@@ -756,11 +752,7 @@ body::before {
 }
 
 .chat-message.user {
-  background: linear-gradient(
-    135deg,
-    var(--gold-500) 0%,
-    var(--gold-600) 100%
-  );
+  background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-600) 100%);
   color: var(--ink-900);
 }
 
