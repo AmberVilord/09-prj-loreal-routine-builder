@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>L'Oréal | Smart Routine &amp; Product Advisor</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Montserrat:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -16,26 +16,89 @@
   </head>
 
   <body>
+    <!-- Floating background petals -->
+    <div class="petals-bg" aria-hidden="true">
+      <span class="petal petal-1">✿</span>
+      <span class="petal petal-2">❀</span>
+      <span class="petal petal-3">✾</span>
+      <span class="petal petal-4">✿</span>
+      <span class="petal petal-5">❁</span>
+      <span class="petal petal-6">✽</span>
+      <span class="petal petal-7">❀</span>
+      <span class="petal petal-8">✿</span>
+      <span class="petal petal-9">✾</span>
+      <span class="petal petal-10">❁</span>
+    </div>
     <div class="page-wrapper">
+      <div class="language-toggle-row">
+        <button
+          id="languageToggle"
+          class="language-toggle-btn"
+          type="button"
+          aria-expanded="false"
+          aria-controls="rtlLanguageSelect"
+        >
+          Right to Left Languages
+        </button>
+        <label for="rtlLanguageSelect" class="visually-hidden"
+          >Choose language</label
+        >
+        <select
+          id="rtlLanguageSelect"
+          class="rtl-language-select hidden"
+          aria-label="Choose a right to left language"
+        >
+          <option value="" selected disabled>Select an RTL language</option>
+          <option id="rtlOptionArabic" value="ar">Arabic</option>
+          <option id="rtlOptionHebrew" value="he">Hebrew</option>
+          <option id="rtlOptionPersian" value="fa">Persian (Farsi)</option>
+          <option id="rtlOptionUrdu" value="ur">Urdu</option>
+          <option id="rtlOptionEnglish" value="en">
+            Back to English (LTR)
+          </option>
+        </select>
+      </div>
+
       <!------- Header / Branding ------->
       <header class="site-header">
+        <div class="header-halo" aria-hidden="true"></div>
         <img src="img/loreal-logo.png" alt="L'Oréal Logo" class="logo" />
-        <h1 class="site-title">Smart Routine &amp; Product Advisor</h1>
+        <h1 id="siteTitle" class="site-title">
+          Smart Routine &amp; Product Advisor
+        </h1>
+        <p class="site-subtitle" aria-hidden="true">
+          ~ your personal beauty ritual ~
+        </p>
+        <div class="header-divider" aria-hidden="true"><span>✦</span></div>
       </header>
 
       <!-- Category Filter -->
       <div class="search-section">
         <select id="categoryFilter">
-          <option value="" disabled selected>Choose a Category</option>
-          <option value="cleanser">Cleansers</option>
-          <option value="moisturizer">Moisturizers & Treatments</option>
-          <option value="haircare">Haircare</option>
-          <option value="makeup">Makeup</option>
-          <option value="hair color">Hair Color</option>
-          <option value="hair styling">Hair Styling</option>
-          <option value="men's grooming">Men's Grooming</option>
-          <option value="suncare">Suncare</option>
-          <option value="fragrance">Fragrance</option>
+          <option id="categoryOptionDefault" value="" disabled selected>
+            Choose a Category
+          </option>
+          <option id="categoryOptionCleanser" value="cleanser">
+            Cleansers
+          </option>
+          <option id="categoryOptionMoisturizer" value="moisturizer">
+            Moisturizers & Treatments
+          </option>
+          <option id="categoryOptionHaircare" value="haircare">Haircare</option>
+          <option id="categoryOptionMakeup" value="makeup">Makeup</option>
+          <option id="categoryOptionHairColor" value="hair color">
+            Hair Color
+          </option>
+          <option id="categoryOptionHairStyling" value="hair styling">
+            Hair Styling
+          </option>
+          <option id="categoryOptionMensGrooming" value="men's grooming">
+            Men's Grooming
+          </option>
+          <option id="categoryOptionSuncare" value="suncare">Suncare</option>
+          <option id="categoryOptionFragrance" value="fragrance">
+            Fragrance
+          </option>
         </select>
       </div>
 
@@ -44,8 +107,11 @@
 
       <!-- Selected Products -->
       <div class="selected-products">
-        <h2>Selected Products</h2>
+        <h2 id="selectedProductsHeading">Selected Products</h2>
         <div id="selectedProductsList"></div>
+        <button id="clearSelected" class="clear-selected-btn">
+          Clear Selected
+        </button>
         <button id="generateRoutine" class="generate-btn">
           <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Routine
         </button>
@@ -53,7 +119,7 @@
 
       <!------- Chat Area ------->
       <section class="chatbox">
-        <h2>Let's Build Your Routine</h2>
+        <h2 id="chatHeading">Let's Build Your Routine</h2>
         <div id="chatWindow" class="chat-window"></div>
 
         <form id="chatForm" class="chat-form">
@@ -75,18 +141,16 @@
 
       <!------- Footer Links ------->
       <footer class="site-footer">
-        <p>&copy; 2025 L'Oréal. All rights reserved.</p>
+        <p id="footerCopyright">&copy; 2025 L'Oréal. All rights reserved.</p>
         <nav>
           <!-- These URLs are placeholders -->
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Use</a>
-          <a href="#">Contact</a>
+          <a id="footerPrivacy" href="#">Privacy Policy</a>
+          <a id="footerTerms" href="#">Terms of Use</a>
+          <a id="footerContact" href="#">Contact</a>
         </nav>
       </footer>
     </div>
 
-    <!-- secrets.js can be removed when using Cloudflare Workers for API requests -->
-    <script src="secrets.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
