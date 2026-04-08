@@ -11,39 +11,18 @@
 /* ---------- Base ---------- */
 body {
   font-family: "Montserrat", Arial, sans-serif;
-  background: linear-gradient(160deg, #fff8f5 0%, #fdf0f8 45%, #f5f0ff 100%);
+  background: #0f4d36;
   background-attachment: fixed;
-  color: #3a2a35;
+  color: #f2f7f4;
   min-height: 100vh;
 }
 
-/* Subtle repeating petal-dot watermark */
+/* Subtle geometric watermark */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image:
-    radial-gradient(
-      ellipse 2px 2px at 18% 22%,
-      rgba(200, 140, 170, 0.18) 100%,
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 2px 2px at 54% 67%,
-      rgba(180, 150, 210, 0.15) 100%,
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 2px 2px at 80% 12%,
-      rgba(200, 140, 170, 0.12) 100%,
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 2px 2px at 35% 88%,
-      rgba(180, 150, 210, 0.12) 100%,
-      transparent 100%
-    );
-  background-size: 260px 260px;
+  background-image: none;
   pointer-events: none;
   z-index: 0;
 }
@@ -144,15 +123,15 @@ body::before {
   overflow: hidden;
 }
 
-/* Soft floral accent behind the header */
+/* Soft geometric accent behind the header */
 .site-header::after {
-  content: "✿";
+  content: "";
   position: absolute;
-  font-size: 220px;
-  color: rgba(210, 150, 185, 0.07);
-  bottom: -40px;
-  right: 20px;
-  line-height: 1;
+  width: 140px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.45), transparent);
+  bottom: 24px;
+  right: 24px;
   pointer-events: none;
 }
 
@@ -624,4 +603,156 @@ input:focus {
     border-radius: 40px;
     height: 48px;
   }
+}
+
+/* ================================================
+   Emerald + Gold Theme Overrides
+   ================================================ */
+
+:root {
+  --emerald-900: #0f2f22;
+  --emerald-800: #174a34;
+  --emerald-700: #1f6a4a;
+  --emerald-600: #2b8a60;
+  --emerald-100: #eef8f2;
+  --ink-900: #111111;
+  --gold-500: #c9a227;
+  --gold-400: #dfbf57;
+  --gold-soft: rgba(201, 162, 39, 0.35);
+  --gold-shadow: rgba(201, 162, 39, 0.28);
+}
+
+body {
+  background: #072f22;
+  color: var(--ink-900);
+}
+
+body::before {
+  background-image: none;
+}
+
+.site-header,
+.search-section,
+.selected-products,
+.chatbox,
+.product-card,
+.chat-window,
+.chat-message.assistant,
+.search-section select,
+.chat-form input,
+.language-toggle-btn,
+.rtl-language-select,
+.clear-selected-btn,
+.details-toggle {
+  border-color: var(--gold-soft);
+  border-width: 2px;
+  box-shadow:
+    0 0 0 1px rgba(223, 191, 87, 0.25),
+    0 8px 22px var(--gold-shadow);
+}
+
+.site-header:hover,
+.search-section:hover,
+.selected-products:hover,
+.chatbox:hover,
+.product-card:hover {
+  box-shadow:
+    0 0 0 1px rgba(223, 191, 87, 0.35),
+    0 12px 30px rgba(201, 162, 39, 0.36);
+}
+
+.site-header {
+  background: linear-gradient(145deg, rgba(245, 252, 248, 0.93) 0%, rgba(234, 247, 238, 0.9) 100%);
+}
+
+.site-title,
+.selected-products h2,
+.chatbox h2 {
+  color: var(--ink-900);
+}
+
+.product-info h3,
+.site-footer,
+.site-footer a,
+.product-brand,
+.selected-empty {
+  color: var(--ink-900);
+}
+
+.site-subtitle,
+.header-divider span,
+.search-section select,
+.chat-form input,
+.chat-message.assistant,
+.placeholder-message,
+.product-description,
+.selected-product-item {
+  color: var(--ink-900);
+}
+
+.generate-btn,
+#sendBtn,
+.chat-message.user {
+  background: linear-gradient(135deg, var(--emerald-700) 0%, var(--emerald-600) 100%);
+  box-shadow: 0 4px 16px rgba(23, 74, 52, 0.22);
+}
+
+.generate-btn:hover,
+#sendBtn:hover {
+  box-shadow: 0 8px 24px rgba(23, 74, 52, 0.32);
+}
+
+.product-card.selected {
+  border-color: var(--gold-500);
+  background: linear-gradient(135deg, rgba(236, 248, 241, 0.95) 0%, rgba(249, 245, 229, 0.95) 100%);
+  box-shadow:
+    0 0 0 3px rgba(201, 162, 39, 0.18),
+    0 8px 28px rgba(31, 106, 74, 0.14);
+}
+
+.selected-product-item {
+  background: linear-gradient(135deg, rgba(43, 138, 96, 0.16) 0%, rgba(223, 191, 87, 0.18) 100%);
+  border-color: var(--gold-500);
+  color: var(--emerald-900);
+}
+
+.selected-product-remove {
+  border-color: var(--gold-500);
+  background: var(--emerald-700);
+}
+
+.selected-product-remove:hover {
+  background: var(--emerald-800);
+}
+
+.language-toggle-btn,
+.rtl-language-select,
+.clear-selected-btn,
+.details-toggle {
+  color: var(--ink-900);
+}
+
+.language-toggle-btn:hover,
+.clear-selected-btn:hover,
+.details-toggle:hover {
+  background: rgba(223, 191, 87, 0.16);
+  border-color: var(--gold-500);
+}
+
+.search-section select:focus,
+.chat-form input:focus,
+button:focus,
+select:focus,
+input:focus {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+
+.logo {
+  filter:
+    hue-rotate(85deg)
+    saturate(2)
+    brightness(0.95)
+    drop-shadow(0 3px 10px rgba(23, 74, 52, 0.25));
 }
