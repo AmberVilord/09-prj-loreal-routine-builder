@@ -843,8 +843,7 @@ generateRoutineBtn.addEventListener("click", async () => {
       messages: [
         {
           role: "system",
-          content:
-            `You are a professional L'Oréal beauty advisor. When given a list of products, create a clear, step-by-step personalized beauty routine that explains how and when to use each product. You must reply in ${getCurrentLanguageName()}.`,
+          content: `You are a professional L'Oréal beauty advisor. When given a list of products, create a clear, step-by-step personalized beauty routine that explains how and when to use each product. You must reply in ${getCurrentLanguageName()}.`,
         },
         {
           role: "user",
@@ -898,8 +897,7 @@ chatForm.addEventListener("submit", async (event) => {
       messages: [
         {
           role: "system",
-          content:
-            `You are a professional L'Oréal beauty advisor with access to current web information. You only answer questions related to the generated routine and topics like skincare, haircare, makeup, and fragrance. If a question is unrelated, politely let the user know you can only help with beauty topics. When you cite sources, include them at the end of your response. You must reply in ${getCurrentLanguageName()}.`,
+          content: `You are a professional L'Oréal beauty advisor with access to current web information. You only answer questions related to the generated routine and topics like skincare, haircare, makeup, and fragrance. If a question is unrelated, politely let the user know you can only help with beauty topics. When you cite sources, include them at the end of your response. You must reply in ${getCurrentLanguageName()}.`,
         },
         /* Spread the full history so the AI has all prior context */
         ...conversationHistory,
@@ -932,7 +930,8 @@ chatForm.addEventListener("submit", async (event) => {
     citations.forEach((annotation) => {
       const link = document.createElement("a");
       link.href = annotation.url_citation.url;
-      link.textContent = annotation.url_citation.title || annotation.url_citation.url;
+      link.textContent =
+        annotation.url_citation.title || annotation.url_citation.url;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.className = "chat-citation-link";
