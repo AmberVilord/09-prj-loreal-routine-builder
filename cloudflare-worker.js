@@ -86,13 +86,19 @@ export default {
       try {
         errorPayload = await openAIResponse.json();
       } catch {
-        errorPayload = { error: { message: "OpenAI returned a non-JSON error response." } };
+        errorPayload = {
+          error: { message: "OpenAI returned a non-JSON error response." },
+        };
       }
 
-      const openAIDetail = errorPayload?.error?.message || "OpenAI request failed.";
+      const openAIDetail =
+        errorPayload?.error?.message || "OpenAI request failed.";
 
       return new Response(
-        JSON.stringify({ error: "OpenAI request failed", details: openAIDetail }),
+        JSON.stringify({
+          error: "OpenAI request failed",
+          details: openAIDetail,
+        }),
         {
           status: openAIResponse.status,
           headers: {

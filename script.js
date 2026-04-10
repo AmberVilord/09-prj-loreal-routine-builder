@@ -558,9 +558,7 @@ async function getRequestErrorMessage(response) {
     }
 
     if (typeof errorData?.details === "string") {
-      details = details
-        ? `${details} ${errorData.details}`
-        : errorData.details;
+      details = details ? `${details} ${errorData.details}` : errorData.details;
     }
   } catch {
     details = "";
@@ -886,7 +884,9 @@ generateRoutineBtn.addEventListener("click", async () => {
 
     /* Parse the response and display the routine in the chat window */
     const data = await response.json();
-    const routineReply = data.choices?.[0]?.message?.content || "I could not generate a routine right now. Please try again.";
+    const routineReply =
+      data.choices?.[0]?.message?.content ||
+      "I could not generate a routine right now. Please try again.";
     loadingMessage.textContent = routineReply;
 
     /* Save both sides of this exchange to conversation history */
@@ -948,7 +948,9 @@ chatForm.addEventListener("submit", async (event) => {
     /* Parse the reply and display it in the chat window */
     const data = await response.json();
     const message = data.choices?.[0]?.message || {};
-    const reply = message.content || "I could not generate a reply right now. Please try again.";
+    const reply =
+      message.content ||
+      "I could not generate a reply right now. Please try again.";
     loadingMessage.textContent = reply;
 
     /* If the AI returned URL citations, display them as clickable links */
