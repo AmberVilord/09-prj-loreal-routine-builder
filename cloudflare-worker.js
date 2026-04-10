@@ -12,7 +12,12 @@ export default {
     }
 
     if (request.method !== "POST") {
-      return new Response("Method Not Allowed", { status: 405 });
+      return new Response("Method Not Allowed", {
+        status: 405,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
     }
 
     const apiKey = env.OPENAI_API_KEY || env.API_KEY;
@@ -76,11 +81,20 @@ export default {
     );
 
     if (!openAIResponse.ok) {
-      const errorText = await openAIResponse.text();
+      let errorPayload;
+
+      try {
+        errorPayload = await openAIResponse.json();
+      } catch {
+        errorPayload = { error: { message: "OpenAI returned a non-JSON error response." } };
+      }
+
+      const openAIDetail = errorPayload?.error?.message || "OpenAI request failed.";
+
       return new Response(
-        JSON.stringify({ error: "OpenAI request failed", details: errorText }),
+        JSON.stringify({ error: "OpenAI request failed", details: openAIDetail }),
         {
-          status: 500,
+          status: openAIResponse.status,
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",

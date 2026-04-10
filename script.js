@@ -101,15 +101,12 @@ const translations = {
     showDescription: "Show description",
     hideDescription: "Hide description",
     removeProductAria: "Remove {name}",
-    selectAtLeastOne:
-      "Select at least one product first. This button is a placeholder for routine generation.",
+    selectAtLeastOne: "Select at least one product first.",
     generateRoutineFor: "Generate a routine for: {products}",
-    routinePlaceholder:
-      "Routine generation placeholder: connect this button to your AI routine builder here.",
-    chatPlaceholder:
-      "Chat placeholder: connect this form to your conversation logic so the assistant can continue the routine discussion.",
+    routineLoading: "Building your personalized routine...",
+    chatLoading: "Thinking...",
     starterMessage:
-      "Choose a category, select products, and use the placeholders to keep building this project.",
+      "Choose a category, select products, then generate your routine.",
   },
   ar: {
     documentTitle: "لوريال | مستشار الروتين والمنتجات الذكي",
@@ -549,6 +546,33 @@ function appendMessage(role, text) {
   return message;
 }
 
+/* Extract a useful error message from a failed fetch response */
+async function getRequestErrorMessage(response) {
+  let details = "";
+
+  try {
+    const errorData = await response.json();
+
+    if (typeof errorData?.error === "string") {
+      details = errorData.error;
+    }
+
+    if (typeof errorData?.details === "string") {
+      details = details
+        ? `${details} ${errorData.details}`
+        : errorData.details;
+    }
+  } catch {
+    details = "";
+  }
+
+  if (!details) {
+    return `Request failed (${response.status}).`;
+  }
+
+  return `Request failed (${response.status}): ${details}`;
+}
+
 /* Keep the starter guidance message translated after language changes */
 function renderOrUpdateStarterMessage() {
   const existingStarterMessage = chatWindow.querySelector(
@@ -822,7 +846,7 @@ generateRoutineBtn.addEventListener("click", async () => {
   );
 
   /* Show a loading message while we wait for the API response */
-  const loadingMessage = appendMessage("assistant", t("routinePlaceholder"));
+  const loadingMessage = appendMessage("assistant", t("routineLoading"));
 
   /* Build a JSON summary of each selected product to send to the AI */
   const productDetails = selectedProducts.map((product) => ({
@@ -833,37 +857,48 @@ generateRoutineBtn.addEventListener("click", async () => {
   }));
 
   /* Call our Cloudflare Worker to generate a personalized routine */
-  const response = await fetch(WORKER_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are a professional L'Oréal beauty advisor. When given a list of products, create a clear, step-by-step personalized beauty routine that explains how and when to use each product. You must reply in ${getCurrentLanguageName()}.`,
-        },
-        {
-          role: "user",
-          content: `Please create a personalized beauty routine using these products: ${JSON.stringify(productDetails)}`,
-        },
-      ],
-    }),
-  });
+  const routinePrompt = `Please create a personalized beauty routine using these products: ${JSON.stringify(productDetails)}`;
 
-  /* Parse the response and display the routine in the chat window */
-  const data = await response.json();
-  const routineReply = data.choices[0].message.content;
-  loadingMessage.textContent = routineReply;
+  try {
+    const response = await fetch(WORKER_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional L'Oréal beauty advisor. When given a list of products, create a clear, step-by-step personalized beauty routine that explains how and when to use each product. You must reply in ${getCurrentLanguageName()}.`,
+          },
+          {
+            role: "user",
+            content: routinePrompt,
+          },
+        ],
+      }),
+    });
 
-  /* Save both sides of this exchange to conversation history */
-  conversationHistory.push({
-    role: "user",
-    content: `Please create a personalized beauty routine using these products: ${JSON.stringify(productDetails)}`,
-  });
-  conversationHistory.push({ role: "assistant", content: routineReply });
+    if (!response.ok) {
+      throw new Error(await getRequestErrorMessage(response));
+    }
+
+    /* Parse the response and display the routine in the chat window */
+    const data = await response.json();
+    const routineReply = data.choices?.[0]?.message?.content || "I could not generate a routine right now. Please try again.";
+    loadingMessage.textContent = routineReply;
+
+    /* Save both sides of this exchange to conversation history */
+    conversationHistory.push({
+      role: "user",
+      content: routinePrompt,
+    });
+    conversationHistory.push({ role: "assistant", content: routineReply });
+  } catch (error) {
+    console.error("Routine generation failed.", error);
+    loadingMessage.textContent = `I could not generate your routine right now. ${error.message}`;
+  }
 });
 
 /* Handle follow-up questions in the chat window */
@@ -881,67 +916,76 @@ chatForm.addEventListener("submit", async (event) => {
   userInput.value = "";
 
   /* Show a loading message while waiting for the reply */
-  const loadingMessage = appendMessage("assistant", t("chatPlaceholder"));
+  const loadingMessage = appendMessage("assistant", t("chatLoading"));
 
   /* Add the user's question to the history before sending */
   conversationHistory.push({ role: "user", content: question });
 
   /* Call our Cloudflare Worker so the API key stays server-side */
-  const response = await fetch(WORKER_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-search-preview",
-      messages: [
-        {
-          role: "system",
-          content: `You are a professional L'Oréal beauty advisor with access to current web information. You only answer questions related to the generated routine and topics like skincare, haircare, makeup, and fragrance. If a question is unrelated, politely let the user know you can only help with beauty topics. When you cite sources, include them at the end of your response. You must reply in ${getCurrentLanguageName()}.`,
-        },
-        /* Spread the full history so the AI has all prior context */
-        ...conversationHistory,
-      ],
-    }),
-  });
-
-  /* Parse the reply and display it in the chat window */
-  const data = await response.json();
-  const message = data.choices[0].message;
-  const reply = message.content;
-  loadingMessage.textContent = reply;
-
-  /* If the AI returned URL citations, display them as clickable links */
-  const annotations = message.annotations || [];
-  const citations = annotations.filter(
-    (annotation) => annotation.type === "url_citation",
-  );
-
-  if (citations.length > 0) {
-    /* Build a citations section below the reply text */
-    const citationsDiv = document.createElement("div");
-    citationsDiv.className = "chat-citations";
-
-    const citationsLabel = document.createElement("p");
-    citationsLabel.textContent = "Sources:";
-    citationsLabel.className = "chat-citations-label";
-    citationsDiv.appendChild(citationsLabel);
-
-    citations.forEach((annotation) => {
-      const link = document.createElement("a");
-      link.href = annotation.url_citation.url;
-      link.textContent =
-        annotation.url_citation.title || annotation.url_citation.url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.className = "chat-citation-link";
-      citationsDiv.appendChild(link);
+  try {
+    const response = await fetch(WORKER_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-search-preview",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional L'Oréal beauty advisor with access to current web information. You only answer questions related to the generated routine and topics like skincare, haircare, makeup, and fragrance. If a question is unrelated, politely let the user know you can only help with beauty topics. When you cite sources, include them at the end of your response. You must reply in ${getCurrentLanguageName()}.`,
+          },
+          /* Spread the full history so the AI has all prior context */
+          ...conversationHistory,
+        ],
+      }),
     });
 
-    loadingMessage.appendChild(citationsDiv);
-  }
+    if (!response.ok) {
+      throw new Error(await getRequestErrorMessage(response));
+    }
 
-  conversationHistory.push({ role: "assistant", content: reply });
+    /* Parse the reply and display it in the chat window */
+    const data = await response.json();
+    const message = data.choices?.[0]?.message || {};
+    const reply = message.content || "I could not generate a reply right now. Please try again.";
+    loadingMessage.textContent = reply;
+
+    /* If the AI returned URL citations, display them as clickable links */
+    const annotations = message.annotations || [];
+    const citations = annotations.filter(
+      (annotation) => annotation.type === "url_citation",
+    );
+
+    if (citations.length > 0) {
+      /* Build a citations section below the reply text */
+      const citationsDiv = document.createElement("div");
+      citationsDiv.className = "chat-citations";
+
+      const citationsLabel = document.createElement("p");
+      citationsLabel.textContent = "Sources:";
+      citationsLabel.className = "chat-citations-label";
+      citationsDiv.appendChild(citationsLabel);
+
+      citations.forEach((annotation) => {
+        const link = document.createElement("a");
+        link.href = annotation.url_citation.url;
+        link.textContent =
+          annotation.url_citation.title || annotation.url_citation.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "chat-citation-link";
+        citationsDiv.appendChild(link);
+      });
+
+      loadingMessage.appendChild(citationsDiv);
+    }
+
+    conversationHistory.push({ role: "assistant", content: reply });
+  } catch (error) {
+    console.error("Chat request failed.", error);
+    loadingMessage.textContent = `I could not reply right now. ${error.message}`;
+  }
 });
 
 /* Update all static labels when the language changes */
