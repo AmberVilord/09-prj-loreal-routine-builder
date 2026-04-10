@@ -1,7 +1,29 @@
 export default {
   async fetch(request, env) {
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
+    }
+
+    const apiKey = env.OPENAI_API_KEY || env.API_KEY;
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: "Missing API key secret in worker environment" }), {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      });
     }
 
     let body;
@@ -18,6 +40,7 @@ export default {
     }
 
     const messages = body.messages;
+    const model = body.model || "gpt-4o";
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: "messages array is required" }), {
@@ -33,10 +56,10 @@ export default {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model,
         messages
       })
     });
@@ -56,9 +79,8 @@ export default {
     }
 
     const data = await openAIResponse.json();
-    const reply = data.choices?.[0]?.message?.content || "No response generated.";
 
-    return new Response(JSON.stringify({ reply }), {
+    return new Response(JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"

@@ -196,7 +196,14 @@ body::before {
 }
 
 /* ---------- Category Select ---------- */
+.filter-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
 .search-section select,
+.search-section input,
 .chat-form input {
   width: 100%;
   padding: 14px 20px;
@@ -214,6 +221,7 @@ body::before {
 }
 
 .search-section select:focus,
+.search-section input:focus,
 .chat-form input:focus {
   outline: none;
   border-color: #b8689a;
@@ -622,6 +630,10 @@ input:focus {
     grid-template-columns: 1fr;
   }
 
+  .filter-row {
+    flex-direction: column;
+  }
+
   .site-title {
     font-size: 28px;
   }
@@ -684,6 +696,7 @@ body::before {
 .chat-window,
 .chat-message.assistant,
 .search-section select,
+.search-section input,
 .chat-form input,
 .language-toggle-btn,
 .rtl-language-select,
@@ -731,6 +744,7 @@ body::before {
 .site-subtitle,
 .header-divider span,
 .search-section select,
+.search-section input,
 .chat-form input,
 .chat-message.assistant,
 .placeholder-message,
@@ -815,4 +829,35 @@ input:focus {
 .logo {
   filter: sepia(0.18) saturate(1.2) brightness(0.98)
     drop-shadow(0 3px 10px rgba(201, 162, 39, 0.3));
+}
+
+/* ---------- Chat Citations (web search sources) ---------- */
+.chat-citations {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(201, 162, 39, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-citations-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.chat-citation-link {
+  font-size: 12px;
+  color: var(--gold-600);
+  text-decoration: underline;
+  word-break: break-word;
+  transition: opacity 0.2s;
+}
+
+.chat-citation-link:hover {
+  opacity: 0.75;
 }

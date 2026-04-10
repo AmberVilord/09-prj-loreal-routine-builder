@@ -1,5 +1,6 @@
 /* Get the main elements we need from the page */
 const categoryFilter = document.getElementById("categoryFilter");
+const productSearchInput = document.getElementById("productSearch");
 const productsContainer = document.getElementById("productsContainer");
 const selectedProductsList = document.getElementById("selectedProductsList");
 const clearSelectedBtn = document.getElementById("clearSelected");
@@ -11,13 +12,39 @@ const languageToggleBtn = document.getElementById("languageToggle");
 const rtlLanguageSelect = document.getElementById("rtlLanguageSelect");
 const rtlLanguageLabel = document.getElementById("rtlLanguageLabel");
 
+/* Send AI requests through your Cloudflare Worker (same origin proxy path) */
+const WORKER_ENDPOINT = "/api/chat";
+
 /* Store all products after we fetch them from products.json */
 let allProducts = [];
 let currentLanguage = "en";
 
+/* Map language codes to full names so we can instruct the AI which language to reply in */
+const LANGUAGE_NAMES = {
+  en: "English",
+  ar: "Arabic",
+  he: "Hebrew",
+  fa: "Persian (Farsi)",
+  ur: "Urdu",
+  ps: "Pashto",
+  sd: "Sindhi",
+  ug: "Uyghur",
+  yi: "Yiddish",
+  dv: "Divehi",
+  ckb: "Kurdish (Sorani)",
+};
+
+/* Return the full language name for the current UI language */
+function getCurrentLanguageName() {
+  return LANGUAGE_NAMES[currentLanguage] || "English";
+}
+
 /* Store selected product ids so we can add/remove them easily */
 const selectedProductIds = new Set();
 const STORAGE_KEY = "loreal-selected-products";
+
+/* Keep the full conversation history so the AI remembers context */
+const conversationHistory = [];
 const RTL_LANGUAGES = new Set([
   "ar",
   "he",
@@ -688,16 +715,40 @@ function removeSelectedProduct(productId) {
   renderSelectedProducts();
 }
 
-/* Filter products when the category changes */
-categoryFilter.addEventListener("change", async (event) => {
+/* Apply both the keyword search and category filter at the same time */
+async function applyFilters() {
   const products = await loadProducts();
-  const selectedCategory = event.target.value;
+  const keyword = productSearchInput.value.trim().toLowerCase();
+  const selectedCategory = categoryFilter.value;
 
-  const filteredProducts = products.filter(
-    (product) => product.category === selectedCategory,
-  );
+  /* Start with all products, then narrow down by active filters */
+  let filtered = products;
 
-  displayProducts(filteredProducts);
+  if (selectedCategory) {
+    filtered = filtered.filter(
+      (product) => product.category === selectedCategory,
+    );
+  }
+
+  if (keyword) {
+    filtered = filtered.filter(
+      (product) =>
+        product.name.toLowerCase().includes(keyword) ||
+        product.description.toLowerCase().includes(keyword),
+    );
+  }
+
+  displayProducts(filtered);
+}
+
+/* Filter products when the category changes */
+categoryFilter.addEventListener("change", () => {
+  applyFilters();
+});
+
+/* Filter products as the user types in the search box */
+productSearchInput.addEventListener("input", () => {
+  applyFilters();
 });
 
 /* Handle clicks inside the product grid */
@@ -751,8 +802,8 @@ clearSelectedBtn.addEventListener("click", () => {
   renderSelectedProducts();
 });
 
-/* Placeholder for routine generation */
-generateRoutineBtn.addEventListener("click", () => {
+/* Send the selected products to OpenAI and display the generated routine */
+generateRoutineBtn.addEventListener("click", async () => {
   const selectedProducts = getSelectedProducts();
 
   if (selectedProducts.length === 0) {
@@ -760,6 +811,7 @@ generateRoutineBtn.addEventListener("click", () => {
     return;
   }
 
+  /* Build a readable list of product names for the user message */
   const productNames = selectedProducts
     .map((product) => product.name)
     .join(", ");
@@ -768,11 +820,55 @@ generateRoutineBtn.addEventListener("click", () => {
     "user",
     tFormat("generateRoutineFor", { products: productNames }),
   );
-  appendMessage("assistant", t("routinePlaceholder"));
+
+  /* Show a loading message while we wait for the API response */
+  const loadingMessage = appendMessage("assistant", t("routinePlaceholder"));
+
+  /* Build a JSON summary of each selected product to send to the AI */
+  const productDetails = selectedProducts.map((product) => ({
+    name: product.name,
+    brand: product.brand,
+    category: product.category,
+    description: product.description,
+  }));
+
+  /* Call our Cloudflare Worker to generate a personalized routine */
+  const response = await fetch(WORKER_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content:
+            `You are a professional L'Oréal beauty advisor. When given a list of products, create a clear, step-by-step personalized beauty routine that explains how and when to use each product. You must reply in ${getCurrentLanguageName()}.`,
+        },
+        {
+          role: "user",
+          content: `Please create a personalized beauty routine using these products: ${JSON.stringify(productDetails)}`,
+        },
+      ],
+    }),
+  });
+
+  /* Parse the response and display the routine in the chat window */
+  const data = await response.json();
+  const routineReply = data.choices[0].message.content;
+  loadingMessage.textContent = routineReply;
+
+  /* Save both sides of this exchange to conversation history */
+  conversationHistory.push({
+    role: "user",
+    content: `Please create a personalized beauty routine using these products: ${JSON.stringify(productDetails)}`,
+  });
+  conversationHistory.push({ role: "assistant", content: routineReply });
 });
 
-/* Placeholder for continuing the conversation in the chat window */
-chatForm.addEventListener("submit", (event) => {
+/* Handle follow-up questions in the chat window */
+chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const question = userInput.value.trim();
@@ -781,10 +877,72 @@ chatForm.addEventListener("submit", (event) => {
     return;
   }
 
+  /* Show the user's message and clear the input right away */
   appendMessage("user", question);
-  appendMessage("assistant", t("chatPlaceholder"));
-
   userInput.value = "";
+
+  /* Show a loading message while waiting for the reply */
+  const loadingMessage = appendMessage("assistant", t("chatPlaceholder"));
+
+  /* Add the user's question to the history before sending */
+  conversationHistory.push({ role: "user", content: question });
+
+  /* Call our Cloudflare Worker so the API key stays server-side */
+  const response = await fetch(WORKER_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-search-preview",
+      messages: [
+        {
+          role: "system",
+          content:
+            `You are a professional L'Oréal beauty advisor with access to current web information. You only answer questions related to the generated routine and topics like skincare, haircare, makeup, and fragrance. If a question is unrelated, politely let the user know you can only help with beauty topics. When you cite sources, include them at the end of your response. You must reply in ${getCurrentLanguageName()}.`,
+        },
+        /* Spread the full history so the AI has all prior context */
+        ...conversationHistory,
+      ],
+    }),
+  });
+
+  /* Parse the reply and display it in the chat window */
+  const data = await response.json();
+  const message = data.choices[0].message;
+  const reply = message.content;
+  loadingMessage.textContent = reply;
+
+  /* If the AI returned URL citations, display them as clickable links */
+  const annotations = message.annotations || [];
+  const citations = annotations.filter(
+    (annotation) => annotation.type === "url_citation",
+  );
+
+  if (citations.length > 0) {
+    /* Build a citations section below the reply text */
+    const citationsDiv = document.createElement("div");
+    citationsDiv.className = "chat-citations";
+
+    const citationsLabel = document.createElement("p");
+    citationsLabel.textContent = "Sources:";
+    citationsLabel.className = "chat-citations-label";
+    citationsDiv.appendChild(citationsLabel);
+
+    citations.forEach((annotation) => {
+      const link = document.createElement("a");
+      link.href = annotation.url_citation.url;
+      link.textContent = annotation.url_citation.title || annotation.url_citation.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.className = "chat-citation-link";
+      citationsDiv.appendChild(link);
+    });
+
+    loadingMessage.appendChild(citationsDiv);
+  }
+
+  conversationHistory.push({ role: "assistant", content: reply });
 });
 
 /* Update all static labels when the language changes */

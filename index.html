@@ -110,9 +110,17 @@
         </nav>
       </header>
 
-      <!-- Category Filter -->
+      <!-- Search & Category Filter -->
       <div class="search-section">
-        <select id="categoryFilter">
+        <div class="filter-row">
+          <label for="productSearch" class="visually-hidden">Search products</label>
+          <input
+            id="productSearch"
+            type="text"
+            placeholder="Search by name or keyword…"
+            autocomplete="off"
+          />
+          <select id="categoryFilter">
           <option id="categoryOptionDefault" value="" disabled selected>
             Choose a Category
           </option>
@@ -138,6 +146,7 @@
             Fragrance
           </option>
         </select>
+        </div>
       </div>
 
       <!-- Products Grid -->
