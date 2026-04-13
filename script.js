@@ -12,8 +12,13 @@ const languageToggleBtn = document.getElementById("languageToggle");
 const rtlLanguageSelect = document.getElementById("rtlLanguageSelect");
 const rtlLanguageLabel = document.getElementById("rtlLanguageLabel");
 
-/* Send AI requests through your Cloudflare Worker (same origin proxy path) */
-const WORKER_ENDPOINT = "/api/chat";
+/*
+  Send AI requests through your Cloudflare Worker.
+  - Default: same-origin /api/chat route
+  - Fallback: same-origin / (common for standalone worker deployments)
+  - Optional override: set window.WORKER_ENDPOINT in index.html
+*/
+const WORKER_ENDPOINT = window.WORKER_ENDPOINT || "/api/chat";
 
 /* Store all products after we fetch them from products.json */
 let allProducts = [];
@@ -585,6 +590,59 @@ async function getRequestErrorMessage(response) {
   return `Request failed (${response.status}): ${details}`;
 }
 
+/* Read and validate the assistant text from OpenAI-style response JSON */
+function getAssistantContentFromResponse(data) {
+  const content = data?.choices?.[0]?.message?.content;
+
+  if (typeof content !== "string" || !content.trim()) {
+    throw new Error(
+      "Worker returned an invalid response. Expected data.choices[0].message.content.",
+    );
+  }
+
+  return content;
+}
+
+/* Send chat messages to worker with safe endpoint fallback */
+async function requestAssistantReply(messages) {
+  const endpointsToTry = Array.from(
+    new Set([
+      WORKER_ENDPOINT,
+      ...(WORKER_ENDPOINT === "/api/chat" ? ["/"] : []),
+    ]),
+  );
+
+  let lastError;
+
+  for (const endpoint of endpointsToTry) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await getRequestErrorMessage(response));
+      }
+
+      const data = await response.json();
+      return getAssistantContentFromResponse(data);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw new Error(
+    `${lastError?.message || "Request failed."} Check WORKER_ENDPOINT in script.js.`,
+  );
+}
+
 /* Keep the starter guidance message translated after language changes */
 function renderOrUpdateStarterMessage() {
   const existingStarterMessage = chatWindow.querySelector(
@@ -917,34 +975,16 @@ generateRoutineBtn.addEventListener("click", async () => {
   const routinePrompt = `Create a step-by-step personalized routine using ONLY these selected products:\n${JSON.stringify(productDetails, null, 2)}`;
 
   try {
-    const response = await fetch(WORKER_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const routineReply = await requestAssistantReply([
+      {
+        role: "system",
+        content: buildBeautyAdvisorSystemPrompt(),
       },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: buildBeautyAdvisorSystemPrompt(),
-          },
-          {
-            role: "user",
-            content: routinePrompt,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(await getRequestErrorMessage(response));
-    }
-
-    const data = await response.json();
-    const routineReply =
-      data.choices?.[0]?.message?.content ||
-      "I could not generate a routine right now. Please try again.";
+      {
+        role: "user",
+        content: routinePrompt,
+      },
+    ]);
 
     loadingMessage.textContent = routineReply;
     hasGeneratedRoutine = true;
@@ -979,35 +1019,17 @@ chatForm.addEventListener("submit", async (event) => {
   const loadingMessage = appendMessage("assistant", t("chatLoading"));
 
   try {
-    const response = await fetch(WORKER_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const assistantReply = await requestAssistantReply([
+      {
+        role: "system",
+        content: buildBeautyAdvisorSystemPrompt(),
       },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: buildBeautyAdvisorSystemPrompt(),
-          },
-          ...conversationHistory,
-          {
-            role: "user",
-            content: question,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(await getRequestErrorMessage(response));
-    }
-
-    const data = await response.json();
-    const assistantReply =
-      data.choices?.[0]?.message?.content ||
-      "I could not answer that right now. Please try again.";
+      ...conversationHistory,
+      {
+        role: "user",
+        content: question,
+      },
+    ]);
 
     loadingMessage.textContent = assistantReply;
     conversationHistory.push({ role: "user", content: question });
