@@ -122,34 +122,47 @@
             placeholder="Search by name or keyword…"
             autocomplete="off"
           />
-          <select id="categoryFilter">
-            <option id="categoryOptionDefault" value="" disabled selected>
-              Choose a Category
-            </option>
-            <option id="categoryOptionCleanser" value="cleanser">
-              Cleansers
-            </option>
-            <option id="categoryOptionMoisturizer" value="moisturizer">
-              Moisturizers & Treatments
-            </option>
-            <option id="categoryOptionHaircare" value="haircare">
-              Haircare
-            </option>
-            <option id="categoryOptionMakeup" value="makeup">Makeup</option>
-            <option id="categoryOptionHairColor" value="hair color">
-              Hair Color
-            </option>
-            <option id="categoryOptionHairStyling" value="hair styling">
-              Hair Styling
-            </option>
-            <option id="categoryOptionMensGrooming" value="men's grooming">
-              Men's Grooming
-            </option>
-            <option id="categoryOptionSuncare" value="suncare">Suncare</option>
-            <option id="categoryOptionFragrance" value="fragrance">
-              Fragrance
-            </option>
-          </select>
+          <div class="category-select-shell">
+            <label for="categoryFilter" class="category-select-label"
+              >Curate By Category</label
+            >
+            <select id="categoryFilter">
+              <option id="categoryOptionDefault" value="" disabled selected>
+                Choose a Category
+              </option>
+              <option id="categoryOptionCleanser" value="cleanser">
+                Cleansers
+              </option>
+              <option id="categoryOptionMoisturizer" value="moisturizer">
+                Moisturizers & Treatments
+              </option>
+              <option id="categoryOptionSkincare" value="skincare">
+                Skincare Serums & Sunscreen
+              </option>
+              <option id="categoryOptionHaircare" value="haircare">
+                Haircare
+              </option>
+              <option id="categoryOptionMakeup" value="makeup">Makeup</option>
+              <option id="categoryOptionHairColor" value="hair color">
+                Hair Color
+              </option>
+              <option id="categoryOptionHairStyling" value="hair styling">
+                Hair Styling
+              </option>
+              <option
+                id="categoryOptionMensGrooming"
+                value="men's grooming"
+              >
+                Men's Grooming
+              </option>
+              <option id="categoryOptionSuncare" value="suncare">
+                Suncare
+              </option>
+              <option id="categoryOptionFragrance" value="fragrance">
+                Fragrance
+              </option>
+            </select>
+          </div>
         </div>
       </div>
 

@@ -77,6 +77,7 @@ const translations = {
     categoryDefault: "Choose a Category",
     categoryCleanser: "Cleansers",
     categoryMoisturizer: "Moisturizers & Treatments",
+    categorySkincare: "Skincare Serums & Sunscreen",
     categoryHaircare: "Haircare",
     categoryMakeup: "Makeup",
     categoryHairColor: "Hair Color",
@@ -104,7 +105,10 @@ const translations = {
     selectAtLeastOne: "Select at least one product first.",
     generateRoutineFor: "Generate a routine for: {products}",
     routineLoading: "Building your personalized routine...",
-    chatLoading: "Thinking...",
+    routinePlaceholder:
+      "Placeholder: connect the Generate Routine button to your AI routine logic.",
+    chatPlaceholder:
+      "Placeholder: connect this chat form to your conversational AI logic.",
     starterMessage:
       "Choose a category, select products, then generate your routine.",
   },
@@ -697,12 +701,15 @@ function displayProducts(products) {
               class="details-toggle"
               aria-expanded="false"
               aria-controls="product-description-${product.id}"
+              aria-label="${t("showDescription")}: ${product.name}"
             >
               ${t("showDescription")}
             </button>
             <p
               id="product-description-${product.id}"
               class="product-description"
+              role="region"
+              aria-label="${product.name} description"
               hidden
             >
               ${product.description}
@@ -781,16 +788,29 @@ productsContainer.addEventListener("click", (event) => {
     const descriptionId = detailsButton.getAttribute("aria-controls");
     const description = document.getElementById(descriptionId);
     const isExpanded = detailsButton.getAttribute("aria-expanded") === "true";
+    const card = detailsButton.closest(".product-card");
 
     detailsButton.setAttribute("aria-expanded", String(!isExpanded));
     detailsButton.textContent = isExpanded
       ? t("showDescription")
       : t("hideDescription");
+    detailsButton.setAttribute(
+      "aria-label",
+      `${isExpanded ? t("showDescription") : t("hideDescription")}: ${card?.querySelector("h3")?.textContent || "product"}`,
+    );
 
     if (description) {
       description.hidden = isExpanded;
     }
 
+    if (card) {
+      card.classList.toggle("description-open", !isExpanded);
+    }
+
+    return;
+  }
+
+  if (event.target.closest(".product-description")) {
     return;
   }
 
@@ -824,7 +844,7 @@ clearSelectedBtn.addEventListener("click", () => {
   renderSelectedProducts();
 });
 
-/* Send the selected products to OpenAI and display the generated routine */
+/* Send selected products to OpenAI and display the generated routine */
 generateRoutineBtn.addEventListener("click", async () => {
   const selectedProducts = getSelectedProducts();
 
@@ -843,10 +863,9 @@ generateRoutineBtn.addEventListener("click", async () => {
     tFormat("generateRoutineFor", { products: productNames }),
   );
 
-  /* Show a loading message while we wait for the API response */
   const loadingMessage = appendMessage("assistant", t("routineLoading"));
 
-  /* Build a JSON summary of each selected product to send to the AI */
+  /* Send only selected product JSON fields to the model */
   const productDetails = selectedProducts.map((product) => ({
     name: product.name,
     brand: product.brand,
@@ -854,8 +873,7 @@ generateRoutineBtn.addEventListener("click", async () => {
     description: product.description,
   }));
 
-  /* Call our Cloudflare Worker to generate a personalized routine */
-  const routinePrompt = `Please create a personalized beauty routine using these products: ${JSON.stringify(productDetails)}`;
+  const routinePrompt = `Create a step-by-step personalized routine using ONLY these selected products:\n${JSON.stringify(productDetails, null, 2)}`;
 
   try {
     const response = await fetch(WORKER_ENDPOINT, {
@@ -868,7 +886,7 @@ generateRoutineBtn.addEventListener("click", async () => {
         messages: [
           {
             role: "system",
-            content: `You are a professional L'Oréal beauty advisor. When given a list of products, create a clear, step-by-step personalized beauty routine that explains how and when to use each product. You must reply in ${getCurrentLanguageName()}.`,
+            content: `You are a professional L'Oreal beauty advisor. Build a clear morning and evening routine using only the provided products. Explain order and how to use each product. Keep the advice practical and beginner-friendly. You must reply in ${getCurrentLanguageName()}.`,
           },
           {
             role: "user",
@@ -882,18 +900,14 @@ generateRoutineBtn.addEventListener("click", async () => {
       throw new Error(await getRequestErrorMessage(response));
     }
 
-    /* Parse the response and display the routine in the chat window */
     const data = await response.json();
     const routineReply =
       data.choices?.[0]?.message?.content ||
       "I could not generate a routine right now. Please try again.";
+
     loadingMessage.textContent = routineReply;
 
-    /* Save both sides of this exchange to conversation history */
-    conversationHistory.push({
-      role: "user",
-      content: routinePrompt,
-    });
+    conversationHistory.push({ role: "user", content: routinePrompt });
     conversationHistory.push({ role: "assistant", content: routineReply });
   } catch (error) {
     console.error("Routine generation failed.", error);
@@ -901,7 +915,7 @@ generateRoutineBtn.addEventListener("click", async () => {
   }
 });
 
-/* Handle follow-up questions in the chat window */
+/* Placeholder: this will later call your conversational AI chat logic */
 chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -915,79 +929,7 @@ chatForm.addEventListener("submit", async (event) => {
   appendMessage("user", question);
   userInput.value = "";
 
-  /* Show a loading message while waiting for the reply */
-  const loadingMessage = appendMessage("assistant", t("chatLoading"));
-
-  /* Add the user's question to the history before sending */
-  conversationHistory.push({ role: "user", content: question });
-
-  /* Call our Cloudflare Worker so the API key stays server-side */
-  try {
-    const response = await fetch(WORKER_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-search-preview",
-        messages: [
-          {
-            role: "system",
-            content: `You are a professional L'Oréal beauty advisor with access to current web information. You only answer questions related to the generated routine and topics like skincare, haircare, makeup, and fragrance. If a question is unrelated, politely let the user know you can only help with beauty topics. When you cite sources, include them at the end of your response. You must reply in ${getCurrentLanguageName()}.`,
-          },
-          /* Spread the full history so the AI has all prior context */
-          ...conversationHistory,
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(await getRequestErrorMessage(response));
-    }
-
-    /* Parse the reply and display it in the chat window */
-    const data = await response.json();
-    const message = data.choices?.[0]?.message || {};
-    const reply =
-      message.content ||
-      "I could not generate a reply right now. Please try again.";
-    loadingMessage.textContent = reply;
-
-    /* If the AI returned URL citations, display them as clickable links */
-    const annotations = message.annotations || [];
-    const citations = annotations.filter(
-      (annotation) => annotation.type === "url_citation",
-    );
-
-    if (citations.length > 0) {
-      /* Build a citations section below the reply text */
-      const citationsDiv = document.createElement("div");
-      citationsDiv.className = "chat-citations";
-
-      const citationsLabel = document.createElement("p");
-      citationsLabel.textContent = "Sources:";
-      citationsLabel.className = "chat-citations-label";
-      citationsDiv.appendChild(citationsLabel);
-
-      citations.forEach((annotation) => {
-        const link = document.createElement("a");
-        link.href = annotation.url_citation.url;
-        link.textContent =
-          annotation.url_citation.title || annotation.url_citation.url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.className = "chat-citation-link";
-        citationsDiv.appendChild(link);
-      });
-
-      loadingMessage.appendChild(citationsDiv);
-    }
-
-    conversationHistory.push({ role: "assistant", content: reply });
-  } catch (error) {
-    console.error("Chat request failed.", error);
-    loadingMessage.textContent = `I could not reply right now. ${error.message}`;
-  }
+  appendMessage("assistant", t("chatPlaceholder"));
 });
 
 /* Update all static labels when the language changes */
@@ -1022,6 +964,9 @@ function updateStaticText() {
   );
   const categoryOptionMoisturizer = document.getElementById(
     "categoryOptionMoisturizer",
+  );
+  const categoryOptionSkincare = document.getElementById(
+    "categoryOptionSkincare",
   );
   const categoryOptionHaircare = document.getElementById(
     "categoryOptionHaircare",
@@ -1072,6 +1017,7 @@ function updateStaticText() {
   categoryOptionDefault.textContent = t("categoryDefault");
   categoryOptionCleanser.textContent = t("categoryCleanser");
   categoryOptionMoisturizer.textContent = t("categoryMoisturizer");
+  categoryOptionSkincare.textContent = t("categorySkincare");
   categoryOptionHaircare.textContent = t("categoryHaircare");
   categoryOptionMakeup.textContent = t("categoryMakeup");
   categoryOptionHairColor.textContent = t("categoryHairColor");

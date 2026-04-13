@@ -1,6 +1,6 @@
 /* ================================================
-   L'Oréal Routine Builder — Emerald & Gold
-   ================================================ */
+  L'Oréal Routine Builder — Refined Editorial
+  ================================================ */
 
 * {
   box-sizing: border-box;
@@ -132,7 +132,7 @@ body::before {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(201, 162, 39, 0.45),
+    rgba(255, 0, 59, 0.45),
     transparent
   );
   bottom: 24px;
@@ -166,7 +166,7 @@ body::before {
 .header-quick-links a {
   text-decoration: none;
   color: #111111;
-  border: 1px solid rgba(201, 162, 39, 0.5);
+  border: 1px solid rgba(255, 0, 59, 0.35);
   background: rgba(255, 255, 255, 0.78);
   border-radius: 999px;
   padding: 8px 14px;
@@ -179,8 +179,8 @@ body::before {
 }
 
 .header-quick-links a:hover {
-  background: rgba(223, 191, 87, 0.22);
-  box-shadow: 0 4px 12px rgba(201, 162, 39, 0.25);
+  background: rgba(255, 0, 59, 0.08);
+  box-shadow: 0 4px 12px rgba(255, 0, 59, 0.22);
   transform: translateY(-1px);
 }
 
@@ -199,7 +199,7 @@ body::before {
 .filter-row {
   display: flex;
   gap: 14px;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .search-section select,
@@ -316,25 +316,41 @@ body::before {
 
 /* ---------- Description Toggle Button ---------- */
 .details-toggle {
-  font-size: 12px;
-  padding: 6px 14px;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 7px 14px;
   margin-bottom: 10px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.09em;
 }
 
 /* ---------- Product Description ---------- */
 .product-description {
+  margin-top: 8px;
   background: linear-gradient(
-    135deg,
-    rgba(255, 235, 248, 0.6) 0%,
-    rgba(245, 235, 255, 0.6) 100%
+    165deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(246, 248, 252, 0.88) 100%
   );
-  border: 1px solid rgba(200, 150, 180, 0.3);
-  border-radius: 16px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  border-left: 4px solid rgba(255, 0, 59, 0.65);
+  border-radius: 10px;
   padding: 12px 14px;
   font-size: 13px;
-  line-height: 1.65;
-  color: #5a3045;
+  line-height: 1.7;
+  color: #2b2527;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.product-card.description-open {
+  box-shadow:
+    0 0 0 2px rgba(255, 0, 59, 0.1),
+    0 12px 30px rgba(17, 17, 17, 0.2);
+}
+
+.details-toggle[aria-expanded="true"] {
+  background: rgba(255, 0, 59, 0.08);
+  border-color: rgba(255, 0, 59, 0.45);
 }
 
 /* ---------- Selected Products List ---------- */
@@ -632,6 +648,15 @@ input:focus {
 
   .filter-row {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .category-select-shell {
+    min-width: 100%;
+  }
+
+  .category-select-label {
+    padding-left: 10px;
   }
 
   .site-title {
@@ -656,16 +681,15 @@ input:focus {
 }
 
 /* ================================================
-   Gold Theme Overrides
+   L'Oreal Brand Theme Overrides
    ================================================ */
 
 :root {
   --ink-900: #111111;
-  --gold-600: #b88a1e;
-  --gold-500: #c9a227;
-  --gold-400: #dfbf57;
-  --gold-soft: rgba(201, 162, 39, 0.35);
-  --gold-shadow: rgba(201, 162, 39, 0.28);
+  --brand-red-600: #ff003b;
+  --brand-red-700: #d40032;
+  --surface-border: rgba(17, 17, 17, 0.14);
+  --surface-shadow: rgba(17, 17, 17, 0.12);
 }
 
 body {
@@ -702,11 +726,11 @@ body::before {
 .rtl-language-select,
 .clear-selected-btn,
 .details-toggle {
-  border-color: var(--gold-soft);
+  border-color: var(--surface-border);
   border-width: 2px;
   box-shadow:
-    0 0 0 1px rgba(223, 191, 87, 0.25),
-    0 8px 22px var(--gold-shadow);
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 10px 28px var(--surface-shadow);
 }
 
 .site-header:hover,
@@ -715,15 +739,15 @@ body::before {
 .chatbox:hover,
 .product-card:hover {
   box-shadow:
-    0 0 0 1px rgba(223, 191, 87, 0.35),
-    0 12px 30px rgba(201, 162, 39, 0.36);
+    0 0 0 1px rgba(255, 0, 59, 0.2),
+    0 12px 30px rgba(17, 17, 17, 0.18);
 }
 
 .site-header {
   background: linear-gradient(
     145deg,
-    rgba(255, 252, 243, 0.93) 0%,
-    rgba(251, 245, 226, 0.9) 100%
+    rgba(255, 255, 255, 0.93) 0%,
+    rgba(242, 244, 248, 0.92) 100%
   );
 }
 
@@ -731,6 +755,8 @@ body::before {
 .selected-products h2,
 .chatbox h2 {
   color: var(--ink-900);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .product-info h3,
@@ -755,51 +781,73 @@ body::before {
 
 .generate-btn,
 #sendBtn {
-  background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 100%);
-  color: var(--ink-900);
-  box-shadow: 0 4px 16px rgba(201, 162, 39, 0.28);
+  background: linear-gradient(135deg, #1e1e1e 0%, #111111 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 0, 59, 0.55);
+  border-radius: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(17, 17, 17, 0.3);
 }
 
 .generate-btn:hover,
 #sendBtn:hover {
-  box-shadow: 0 8px 24px rgba(201, 162, 39, 0.4);
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.35);
 }
 
 .chat-message.user {
-  background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-600) 100%);
-  color: var(--ink-900);
+  background: linear-gradient(
+    135deg,
+    rgba(212, 0, 50, 0.95) 0%,
+    rgba(255, 0, 59, 0.92) 100%
+  );
+  border: 1px solid rgba(255, 0, 59, 0.75);
+  color: #ffffff;
+}
+
+.chat-message.assistant {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 59, 0.12) 0%,
+    rgba(255, 0, 59, 0.2) 100%
+  );
+  border: 1px solid rgba(255, 0, 59, 0.35);
+  color: #111111;
 }
 
 .product-card.selected {
-  border-color: var(--gold-500);
+  border-color: var(--brand-red-600);
+  border-radius: 14px;
   background: linear-gradient(
     135deg,
-    rgba(252, 248, 236, 0.95) 0%,
-    rgba(249, 245, 229, 0.95) 100%
+    rgba(255, 247, 249, 0.95) 0%,
+    rgba(255, 255, 255, 0.95) 100%
   );
   box-shadow:
-    0 0 0 3px rgba(201, 162, 39, 0.18),
-    0 8px 28px rgba(201, 162, 39, 0.2);
+    0 0 0 3px rgba(255, 0, 59, 0.12),
+    0 8px 28px rgba(17, 17, 17, 0.14);
 }
 
 .selected-product-item {
-  background: linear-gradient(
-    135deg,
-    rgba(201, 162, 39, 0.2) 0%,
-    rgba(223, 191, 87, 0.18) 100%
-  );
-  border-color: var(--gold-500);
+  background: linear-gradient(135deg, rgba(255, 0, 59, 0.08) 0%, #ffffff 100%);
+  border-color: rgba(255, 0, 59, 0.35);
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
   color: var(--ink-900);
 }
 
 .selected-product-remove {
-  border-color: var(--gold-500);
-  background: var(--gold-500);
-  color: var(--ink-900);
+  border-color: var(--brand-red-600);
+  background: var(--brand-red-600);
+  color: #ffffff;
 }
 
 .selected-product-remove:hover {
-  background: var(--gold-400);
+  background: var(--brand-red-700);
 }
 
 .language-toggle-btn,
@@ -807,13 +855,152 @@ body::before {
 .clear-selected-btn,
 .details-toggle {
   color: var(--ink-900);
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+
+.search-section,
+.selected-products,
+.chatbox,
+.site-header {
+  border-radius: 18px;
+}
+
+.product-card,
+.chat-window,
+.chat-message.assistant,
+.chat-message.user,
+.search-section input,
+.chat-form input,
+#productSearch {
+  border-radius: 12px;
+}
+
+.header-quick-links a {
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+}
+
+.product-brand {
+  letter-spacing: 0.12em;
+  font-size: 11px;
 }
 
 .language-toggle-btn:hover,
 .clear-selected-btn:hover,
 .details-toggle:hover {
-  background: rgba(223, 191, 87, 0.16);
-  border-color: var(--gold-500);
+  background: rgba(255, 0, 59, 0.08);
+  border-color: rgba(255, 0, 59, 0.5);
+}
+
+/* Luxury category selector */
+.category-select-shell {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+}
+
+.category-select-label {
+  display: block;
+  margin-bottom: 8px;
+  padding-left: 14px;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 14px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.72);
+}
+
+.category-select-shell::before {
+  content: none;
+}
+
+.category-select-shell::after {
+  content: "";
+  position: absolute;
+  right: 24px;
+  bottom: 31px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(17, 17, 17, 0.85);
+  border-bottom: 2px solid rgba(17, 17, 17, 0.85);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+#categoryFilter {
+  cursor: pointer;
+  border-radius: 12px;
+  border: 1.5px solid rgba(17, 17, 17, 0.22);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(243, 246, 251, 0.95) 100%
+  );
+  color: #111111;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  min-height: 58px;
+  padding: 14px 50px 14px 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 22px rgba(17, 17, 17, 0.12);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+#categoryFilter:hover {
+  border-color: rgba(255, 0, 59, 0.55);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 14px 24px rgba(17, 17, 17, 0.18);
+}
+
+#categoryFilter:focus {
+  border-color: rgba(255, 0, 59, 0.85);
+  box-shadow:
+    0 0 0 3px rgba(255, 0, 59, 0.14),
+    0 14px 24px rgba(17, 17, 17, 0.18);
+}
+
+#productSearch {
+  min-height: 58px;
+}
+
+#categoryFilter option {
+  color: #111111;
+  background: #ffffff;
+  font-size: 13px;
+}
+
+[dir="rtl"] .category-select-label {
+  padding-left: 0;
+  padding-right: 14px;
+  text-align: right;
+}
+
+[dir="rtl"] .category-select-shell::before {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .category-select-shell::after {
+  right: auto;
+  left: 24px;
+}
+
+[dir="rtl"] #categoryFilter {
+  padding: 14px 22px 14px 50px;
 }
 
 .search-section select:focus,
@@ -821,21 +1008,21 @@ body::before {
 button:focus,
 select:focus,
 input:focus {
-  outline: 2px solid var(--gold-500);
+  outline: 2px solid var(--brand-red-600);
   outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+  box-shadow: 0 0 0 3px rgba(255, 0, 59, 0.14);
 }
 
 .logo {
   filter: sepia(0.18) saturate(1.2) brightness(0.98)
-    drop-shadow(0 3px 10px rgba(201, 162, 39, 0.3));
+    drop-shadow(0 3px 10px rgba(255, 0, 59, 0.22));
 }
 
 /* ---------- Chat Citations (web search sources) ---------- */
 .chat-citations {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid rgba(201, 162, 39, 0.3);
+  border-top: 1px solid rgba(255, 0, 59, 0.25);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -852,7 +1039,7 @@ input:focus {
 
 .chat-citation-link {
   font-size: 12px;
-  color: var(--gold-600);
+  color: var(--brand-red-700);
   text-decoration: underline;
   word-break: break-word;
   transition: opacity 0.2s;
