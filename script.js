@@ -45,6 +45,11 @@ const STORAGE_KEY = "loreal-selected-products";
 
 /* Keep the full conversation history so the AI remembers context */
 const conversationHistory = [];
+let hasGeneratedRoutine = false;
+
+/* Allow follow-up chat only for routine/beauty-related topics */
+const BEAUTY_TOPIC_REGEX =
+  /\b(routine|skincare|skin care|cleanser|moisturi(?:zer|sing)|serum|sunscreen|spf|retinol|acne|haircare|hair care|hair|shampoo|conditioner|scalp|makeup|foundation|concealer|mascara|eyeliner|lipstick|fragrance|perfume|beauty|product|loreal|l'or[eé]al|morning|evening|am|pm|exfoliat|tone|toner|sensitive skin|dry skin|oily skin|combination skin)\b/i;
 const RTL_LANGUAGES = new Set([
   "ar",
   "he",
@@ -105,10 +110,15 @@ const translations = {
     selectAtLeastOne: "Select at least one product first.",
     generateRoutineFor: "Generate a routine for: {products}",
     routineLoading: "Building your personalized routine...",
+    chatLoading: "Thinking...",
     routinePlaceholder:
       "Placeholder: connect the Generate Routine button to your AI routine logic.",
     chatPlaceholder:
       "Placeholder: connect this chat form to your conversational AI logic.",
+    chatScopeLimit:
+      "I can only answer questions about your generated routine or related beauty topics like skincare, haircare, makeup, and fragrance.",
+    chatError:
+      "I could not answer right now. Please try again. Details: {details}",
     starterMessage:
       "Choose a category, select products, then generate your routine.",
   },
@@ -590,6 +600,36 @@ function renderOrUpdateStarterMessage() {
   starterMessage.dataset.messageType = "starter";
 }
 
+/* Build the base AI behavior once so both routine and chat stay consistent */
+function buildBeautyAdvisorSystemPrompt() {
+  return `You are a professional L'Oreal beauty advisor.
+Only answer questions related to:
+- The user's generated routine in this conversation
+- Skincare, haircare, makeup, fragrance, and closely related beauty topics
+
+If a question is out of scope (for example politics, coding, finance, sports, etc.), politely refuse and redirect to supported beauty topics.
+Keep answers practical, clear, and beginner-friendly.
+Reply in ${getCurrentLanguageName()}.`;
+}
+
+/* Light client-side guard so off-topic questions are blocked before API calls */
+function isAllowedBeautyQuestion(question) {
+  const normalizedQuestion = String(question || "").toLowerCase();
+
+  if (BEAUTY_TOPIC_REGEX.test(normalizedQuestion)) {
+    return true;
+  }
+
+  /* After a routine exists, allow short references to "this" routine steps */
+  if (!hasGeneratedRoutine) {
+    return false;
+  }
+
+  return /\b(this|that|it|them|step|order|first|next|after|before|daily)\b/i.test(
+    normalizedQuestion,
+  );
+}
+
 /* Save selected product ids in localStorage so they stay after reload */
 function saveSelectedProducts() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...selectedProductIds]));
@@ -858,10 +898,11 @@ generateRoutineBtn.addEventListener("click", async () => {
     .map((product) => product.name)
     .join(", ");
 
-  appendMessage(
-    "user",
-    tFormat("generateRoutineFor", { products: productNames }),
-  );
+  const routineRequestMessage = tFormat("generateRoutineFor", {
+    products: productNames,
+  });
+
+  appendMessage("user", routineRequestMessage);
 
   const loadingMessage = appendMessage("assistant", t("routineLoading"));
 
@@ -886,7 +927,7 @@ generateRoutineBtn.addEventListener("click", async () => {
         messages: [
           {
             role: "system",
-            content: `You are a professional L'Oreal beauty advisor. Build a clear morning and evening routine using only the provided products. Explain order and how to use each product. Keep the advice practical and beginner-friendly. You must reply in ${getCurrentLanguageName()}.`,
+            content: buildBeautyAdvisorSystemPrompt(),
           },
           {
             role: "user",
@@ -906,8 +947,9 @@ generateRoutineBtn.addEventListener("click", async () => {
       "I could not generate a routine right now. Please try again.";
 
     loadingMessage.textContent = routineReply;
+    hasGeneratedRoutine = true;
 
-    conversationHistory.push({ role: "user", content: routinePrompt });
+    conversationHistory.push({ role: "user", content: routineRequestMessage });
     conversationHistory.push({ role: "assistant", content: routineReply });
   } catch (error) {
     console.error("Routine generation failed.", error);
@@ -915,7 +957,7 @@ generateRoutineBtn.addEventListener("click", async () => {
   }
 });
 
-/* Placeholder: this will later call your conversational AI chat logic */
+/* Handle follow-up chat using full conversation history for context */
 chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -925,11 +967,57 @@ chatForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  if (!isAllowedBeautyQuestion(question)) {
+    appendMessage("assistant", t("chatScopeLimit"));
+    return;
+  }
+
   /* Show the user's message and clear the input right away */
   appendMessage("user", question);
   userInput.value = "";
 
-  appendMessage("assistant", t("chatPlaceholder"));
+  const loadingMessage = appendMessage("assistant", t("chatLoading"));
+
+  try {
+    const response = await fetch(WORKER_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: buildBeautyAdvisorSystemPrompt(),
+          },
+          ...conversationHistory,
+          {
+            role: "user",
+            content: question,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(await getRequestErrorMessage(response));
+    }
+
+    const data = await response.json();
+    const assistantReply =
+      data.choices?.[0]?.message?.content ||
+      "I could not answer that right now. Please try again.";
+
+    loadingMessage.textContent = assistantReply;
+    conversationHistory.push({ role: "user", content: question });
+    conversationHistory.push({ role: "assistant", content: assistantReply });
+  } catch (error) {
+    console.error("Chat follow-up failed.", error);
+    loadingMessage.textContent = tFormat("chatError", {
+      details: error.message,
+    });
+  }
 });
 
 /* Update all static labels when the language changes */

@@ -11,7 +11,11 @@
 /* ---------- Base ---------- */
 body {
   font-family: "Montserrat", Arial, sans-serif;
-  background: #0f4d36;
+  background-color: #000000;
+  background-image: url("https://i.pinimg.com/736x/0a/a0/41/0aa041b9ac8e4777135fde10ecde5067.jpg");
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: min(782px, 106vw) auto;
   background-attachment: fixed;
   color: #f2f7f4;
   min-height: 100vh;
@@ -224,8 +228,8 @@ body::before {
 .search-section input:focus,
 .chat-form input:focus {
   outline: none;
-  border-color: #b8689a;
-  box-shadow: 0 0 0 3px rgba(184, 104, 154, 0.15);
+  border-color: rgba(255, 0, 59, 0.65);
+  box-shadow: 0 0 0 3px rgba(255, 0, 59, 0.14);
 }
 
 /* ---------- Products Grid ---------- */
@@ -561,7 +565,7 @@ body::before {
 button:focus,
 select:focus,
 input:focus {
-  outline: 2px solid #b8689a;
+  outline: 2px solid rgba(255, 0, 59, 0.7);
   outline-offset: 2px;
 }
 
@@ -693,10 +697,10 @@ input:focus {
 }
 
 body {
-  background-color: #2a220f;
-  background-image: url("https://www.lorealparisusa.com/-/media/project/loreal/brand-sites/oap/americas/us/articles/because-our-planet-is-worth-it/sustainability-2/our-commitment-for-the-planet.png");
-  background-position: center;
-  background-size: cover;
+  background-color: #000000;
+  background-image: url("https://i.pinimg.com/736x/0a/a0/41/0aa041b9ac8e4777135fde10ecde5067.jpg");
+  background-position: left top;
+  background-size: min(782px, 106vw) auto;
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: var(--ink-900);
