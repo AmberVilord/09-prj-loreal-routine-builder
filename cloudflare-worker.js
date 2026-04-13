@@ -50,7 +50,12 @@ export default {
     }
 
     const messages = body.messages;
-    const model = body.model || "gpt-4o";
+    const requestedModel = body.model || "gpt-4.1";
+    const enableWebSearch = body.enableWebSearch !== false;
+    const model =
+      enableWebSearch && requestedModel === "gpt-4o"
+        ? "gpt-4.1"
+        : requestedModel;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -65,20 +70,28 @@ export default {
       );
     }
 
-    const openAIResponse = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-        }),
+    /* Convert chat-style messages into one input string for the Responses API */
+    const input = messages
+      .map((message) => `${message.role.toUpperCase()}: ${message.content}`)
+      .join("\n\n");
+
+    const requestBody = {
+      model,
+      input,
+    };
+
+    if (enableWebSearch) {
+      requestBody.tools = [{ type: "web_search_preview" }];
+    }
+
+    const openAIResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
-    );
+      body: JSON.stringify(requestBody),
+    });
 
     if (!openAIResponse.ok) {
       let errorPayload;
@@ -111,7 +124,26 @@ export default {
 
     const data = await openAIResponse.json();
 
-    return new Response(JSON.stringify(data), {
+    /* Extract source links from web search annotations if present */
+    const citations = extractCitations(data);
+
+    const assistantText =
+      (typeof data.output_text === "string" && data.output_text.trim()) ||
+      "I could not generate a response right now. Please try again.";
+
+    /* Return a chat-completions-like shape so frontend parsing stays simple */
+    const normalizedResponse = {
+      choices: [
+        {
+          message: {
+            content: assistantText,
+          },
+        },
+      ],
+      citations,
+    };
+
+    return new Response(JSON.stringify(normalizedResponse), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -119,3 +151,47 @@ export default {
     });
   },
 };
+
+/* Collect unique citation URLs from nested Responses API payload fields */
+function extractCitations(data) {
+  const seenUrls = new Set();
+  const citations = [];
+
+  function visit(value) {
+    if (!value) {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+      return;
+    }
+
+    if (typeof value !== "object") {
+      return;
+    }
+
+    const maybeUrl =
+      typeof value.url === "string"
+        ? value.url
+        : typeof value.href === "string"
+          ? value.href
+          : "";
+
+    if (maybeUrl && /^https?:\/\//i.test(maybeUrl) && !seenUrls.has(maybeUrl)) {
+      seenUrls.add(maybeUrl);
+      citations.push({
+        title:
+          typeof value.title === "string" && value.title.trim()
+            ? value.title
+            : maybeUrl,
+        url: maybeUrl,
+      });
+    }
+
+    Object.values(value).forEach(visit);
+  }
+
+  visit(data?.output);
+  return citations.slice(0, 8);
+}

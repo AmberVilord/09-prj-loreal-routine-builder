@@ -555,10 +555,33 @@ function showChooseCategoryPlaceholder() {
 showChooseCategoryPlaceholder();
 
 /* Add a message to the chat window */
-function appendMessage(role, text) {
+function appendMessage(role, text, options = {}) {
   const message = document.createElement("div");
   message.className = `chat-message ${role}`;
   message.textContent = text;
+
+  if (Array.isArray(options.citations) && options.citations.length > 0) {
+    const citationsBox = document.createElement("div");
+    citationsBox.className = "chat-citations";
+
+    const citationsLabel = document.createElement("div");
+    citationsLabel.className = "chat-citations-label";
+    citationsLabel.textContent = "Sources";
+    citationsBox.appendChild(citationsLabel);
+
+    options.citations.forEach((citation) => {
+      const link = document.createElement("a");
+      link.className = "chat-citation-link";
+      link.href = citation.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = citation.title || citation.url;
+      citationsBox.appendChild(link);
+    });
+
+    message.appendChild(citationsBox);
+  }
+
   chatWindow.appendChild(message);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
@@ -590,9 +613,9 @@ async function getRequestErrorMessage(response) {
   return `Request failed (${response.status}): ${details}`;
 }
 
-/* Read and validate the assistant text from OpenAI-style response JSON */
-function getAssistantContentFromResponse(data) {
-  const content = data?.choices?.[0]?.message?.content;
+/* Read assistant text + citations from worker response JSON */
+function parseAssistantPayload(data) {
+  const content = data?.choices?.[0]?.message?.content || data?.output_text;
 
   if (typeof content !== "string" || !content.trim()) {
     throw new Error(
@@ -600,11 +623,28 @@ function getAssistantContentFromResponse(data) {
     );
   }
 
-  return content;
+  const citations = Array.isArray(data?.citations)
+    ? data.citations
+        .filter((item) => typeof item?.url === "string")
+        .map((item) => ({
+          title:
+            typeof item.title === "string" && item.title.trim()
+              ? item.title
+              : item.url,
+          url: item.url,
+        }))
+    : [];
+
+  return {
+    content: content.trim(),
+    citations,
+  };
 }
 
 /* Send chat messages to worker with safe endpoint fallback */
-async function requestAssistantReply(messages) {
+async function requestAssistantReply(messages, options = {}) {
+  const enableWebSearch = options.enableWebSearch !== false;
+
   const endpointsToTry = Array.from(
     new Set([
       WORKER_ENDPOINT,
@@ -622,8 +662,9 @@ async function requestAssistantReply(messages) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o",
+          model: "gpt-4.1",
           messages,
+          enableWebSearch,
         }),
       });
 
@@ -632,7 +673,7 @@ async function requestAssistantReply(messages) {
       }
 
       const data = await response.json();
-      return getAssistantContentFromResponse(data);
+      return parseAssistantPayload(data);
     } catch (error) {
       lastError = error;
     }
@@ -975,7 +1016,7 @@ generateRoutineBtn.addEventListener("click", async () => {
   const routinePrompt = `Create a step-by-step personalized routine using ONLY these selected products:\n${JSON.stringify(productDetails, null, 2)}`;
 
   try {
-    const routineReply = await requestAssistantReply([
+    const routineResult = await requestAssistantReply([
       {
         role: "system",
         content: buildBeautyAdvisorSystemPrompt(),
@@ -986,11 +1027,18 @@ generateRoutineBtn.addEventListener("click", async () => {
       },
     ]);
 
-    loadingMessage.textContent = routineReply;
+    loadingMessage.textContent = routineResult.content;
+    if (routineResult.citations.length > 0) {
+      appendMessage("assistant", routineResult.content, {
+        citations: routineResult.citations,
+      });
+      loadingMessage.remove();
+    }
+
     hasGeneratedRoutine = true;
 
     conversationHistory.push({ role: "user", content: routineRequestMessage });
-    conversationHistory.push({ role: "assistant", content: routineReply });
+    conversationHistory.push({ role: "assistant", content: routineResult.content });
   } catch (error) {
     console.error("Routine generation failed.", error);
     loadingMessage.textContent = `I could not generate your routine right now. ${error.message}`;
@@ -1019,7 +1067,7 @@ chatForm.addEventListener("submit", async (event) => {
   const loadingMessage = appendMessage("assistant", t("chatLoading"));
 
   try {
-    const assistantReply = await requestAssistantReply([
+    const assistantResult = await requestAssistantReply([
       {
         role: "system",
         content: buildBeautyAdvisorSystemPrompt(),
@@ -1031,9 +1079,16 @@ chatForm.addEventListener("submit", async (event) => {
       },
     ]);
 
-    loadingMessage.textContent = assistantReply;
+    loadingMessage.textContent = assistantResult.content;
+    if (assistantResult.citations.length > 0) {
+      appendMessage("assistant", assistantResult.content, {
+        citations: assistantResult.citations,
+      });
+      loadingMessage.remove();
+    }
+
     conversationHistory.push({ role: "user", content: question });
-    conversationHistory.push({ role: "assistant", content: assistantReply });
+    conversationHistory.push({ role: "assistant", content: assistantResult.content });
   } catch (error) {
     console.error("Chat follow-up failed.", error);
     loadingMessage.textContent = tFormat("chatError", {
