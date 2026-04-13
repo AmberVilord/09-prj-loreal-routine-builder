@@ -1038,7 +1038,10 @@ generateRoutineBtn.addEventListener("click", async () => {
     hasGeneratedRoutine = true;
 
     conversationHistory.push({ role: "user", content: routineRequestMessage });
-    conversationHistory.push({ role: "assistant", content: routineResult.content });
+    conversationHistory.push({
+      role: "assistant",
+      content: routineResult.content,
+    });
   } catch (error) {
     console.error("Routine generation failed.", error);
     loadingMessage.textContent = `I could not generate your routine right now. ${error.message}`;
@@ -1088,7 +1091,10 @@ chatForm.addEventListener("submit", async (event) => {
     }
 
     conversationHistory.push({ role: "user", content: question });
-    conversationHistory.push({ role: "assistant", content: assistantResult.content });
+    conversationHistory.push({
+      role: "assistant",
+      content: assistantResult.content,
+    });
   } catch (error) {
     console.error("Chat follow-up failed.", error);
     loadingMessage.textContent = tFormat("chatError", {
